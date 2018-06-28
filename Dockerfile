@@ -1,4 +1,4 @@
-FROM quay.io/ukhomeofficedigital/centos-base
+FROM registry.access.redhat.com/jboss-fuse-6/fis-java-openshift:2.0
 
 ENV CLAM_VERSION=0.99.4
 
