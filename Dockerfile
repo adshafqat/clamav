@@ -1,5 +1,5 @@
 FROM registry.access.redhat.com/jboss-fuse-6/fis-java-openshift:2.0
-
+USER root
 ENV CLAM_VERSION=0.99.4
 
 RUN yum update -y && \
