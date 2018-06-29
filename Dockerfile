@@ -38,8 +38,7 @@ RUN mkdir /var/run/clamav && \
 ADD ./*.conf /usr/local/etc/
 ADD eicar.com /
 ADD ./readyness.sh /
-
-# VOLUME /var/lib/clamav
+VOLUME /var/lib/clamav
 
 COPY docker-entrypoint.sh /
 
