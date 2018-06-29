@@ -31,7 +31,7 @@ RUN wget -t 5 -T 99999 -O /var/lib/clamav/main.cvd http://database.clamav.net/ma
 RUN mkdir /var/run/clamav && \
     chown clamav:clamav /var/run/clamav && \
     chmod 750 /var/run/clamav && \
-    chmod 777 /var/lib/clamav
+    chown UID:GID /var/lib/clamav && chmod 755 /var/lib/clamav
 
 USER clamav
 
