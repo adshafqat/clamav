@@ -30,9 +30,10 @@ RUN wget -t 5 -T 99999 -O /var/lib/clamav/main.cvd http://database.clamav.net/ma
 # permissions
 RUN mkdir /var/run/clamav && \
     chown clamav:clamav /var/run/clamav && \
-    chmod 750 /var/run/clamav
+    chmod 750 /var/run/clamav && \
+    chmod 777 /var/lib/clamav
 
-USER 1000
+USER clamav
 
 # Configure Clam AV...
 ADD ./*.conf /usr/local/etc/
