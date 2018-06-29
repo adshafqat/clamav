@@ -1,0 +1,62 @@
+FROM registry.access.redhat.com/jboss-fuse-6/fis-java-openshift:2.0
+USER root
+ADD clamav-0.100.0/ /tmp/clamav/
+
+    
+RUN yum-config-manager --add-repo=http://lhprpsy03v.pgds.local/repos/3rdParty/latest/epel/
+RUN yum-config-manager --add-repo=http://lhprpsy03v.pgds.local/repos/RedHat/7/latest/rhel-7-server-rpms/
+
+RUN yum update -y && \
+    yum install -y gcc openssl-devel wget make
+    
+
+RUN cd /tmp/clamav &&  chmod +x configure &&    ./configure 
+    
+RUN cd /tmp/clamav && /usr/bin/make 
+    
+RUN cd /tmp/clamav && /usr/bin/make install    
+RUN   yum remove -y gcc make &&  yum clean all    
+    
+# Add clamav user
+RUN groupadd -r clamav && \
+    useradd -r -g clamav -u 1000 clamav -d /var/lib/clamav && \
+    mkdir -p /var/lib/clamav && \
+    mkdir /usr/local/share/clamav && \
+    chown -R clamav:clamav /var/lib/clamav /usr/local/share/clamav    
+    
+
+
+# initial update of av databases
+RUN wget -t 5 -T 99999 -O /var/lib/clamav/main.cvd http://gitlab.dev1-openshift-internal.pru.local/OpenShift/clamav/raw/master/main.cvd && \
+    wget -t 5 -T 99999 -O /var/lib/clamav/daily.cvd http://gitlab.dev1-openshift-internal.pru.local/OpenShift/clamav/raw/master/daily.cvd && \
+    wget -t 5 -T 99999 -O /var/lib/clamav/bytecode.cvd http://gitlab.dev1-openshift-internal.pru.local/OpenShift/clamav/raw/master/bytecode.cvd && \
+    chown clamav:clamav /var/lib/clamav/*.cvd
+
+# download virus definitions
+# ADD main.cvd /var/lib/clamav/main.cvd
+# ADD daily.cvd /var/lib/clamav/daily.cvd
+# ADD bytecode.cvd /var/lib/clamav/bytecode.cvd
+# RUN chown clamav:clamav /var/lib/clamav/*.cvd
+
+
+# permissions
+RUN mkdir /var/run/clamav && \
+    chown clamav:clamav /var/run/clamav && \
+    chmod 750 /var/run/clamav && \
+    chmod 777 /var/lib/clamav
+
+COPY docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+
+
+# Configure Clam AV...
+ADD ./*.conf /usr/local/etc/
+ADD eicar.com /
+ADD ./readyness.sh /
+
+#VOLUME /var/lib/clamav
+#VOLUME ["/var/lib/clamav"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+EXPOSE 3310
+USER 1000
