@@ -31,9 +31,8 @@ RUN wget -t 5 -T 99999 -O /var/lib/clamav/main.cvd http://database.clamav.net/ma
 RUN mkdir /var/run/clamav && \
     chown clamav:clamav /var/run/clamav && \
     chmod 750 /var/run/clamav && \
-    chown UID:GID /var/lib/clamav && chmod 755 /var/lib/clamav
+    chown clamav:clamav  /var/lib/clamav && chmod 755 /var/lib/clamav
 
-USER clamav
 
 # Configure Clam AV...
 ADD ./*.conf /usr/local/etc/
@@ -47,3 +46,4 @@ COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 3310
+USER 1000
