@@ -46,4 +46,4 @@ COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 3310
-USER 1000
+# USER 1000
